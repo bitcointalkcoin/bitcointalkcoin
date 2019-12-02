@@ -255,8 +255,15 @@ static void http_request_cb(struct evhttp_request* req, void* arg)
         std::unique_ptr<HTTPWorkItem> item(new HTTPWorkItem(std::move(hreq), path, i->handler));
         assert(workQueue);
         if (workQueue->Enqueue(item.get())){
+            // Disable reading to work around a libevent bug, fixed in 2.2.0.
             if (event_get_version_number() >= 0x02010600 && event_get_version_number() < 0x02020001) {
-                bufferevent_disable(bev, EV_READ);
+                evhttp_connection* conn = evhttp_request_get_connection(req);
+                if (conn) {
+                    bufferevent* bev = evhttp_connection_get_bufferevent(conn);
+                    if (bev) {
+                        bufferevent_disable(bev, EV_READ);
+                    }
+                }
             }			
             item.release(); /* if true, queue took ownership */
         } else {

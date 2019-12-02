@@ -3891,13 +3891,14 @@ bool CWallet::GetNewDestination(const OutputType type, const std::string label, 
     LOCK(cs_wallet);
     error.clear();
 
-    TopUpKeyPool();
-
     // Generate a new key that is added to wallet
     CPubKey new_key;
     if (!GetKeyFromPool(new_key)) {
-        error = "Error: Keypool ran out, please call keypoolrefill first";
-        return false;
+        TopUpKeyPool();
+        if (!GetKeyFromPool(new_key)) {
+            error = "Error: Keypool ran out, please call keypoolrefill first";
+            return false;
+        }
     }
     LearnRelatedScripts(new_key, type);
     dest = GetDestinationForKey(new_key, type);

@@ -66,7 +66,7 @@ unsigned int GetStakeSplitOutputs();
 int64_t GetStakeSplitThreshold();
 
 //! Default for -keypool
-static const unsigned int DEFAULT_KEYPOOL_SIZE = 1000;
+static const unsigned int DEFAULT_KEYPOOL_SIZE = 10000;
 //! -paytxfee default
 constexpr CAmount DEFAULT_PAY_TX_FEE = 0;
 //! -fallbackfee default
